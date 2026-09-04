@@ -206,6 +206,9 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
+# Hugging Face cache
+hf-cache/
+
 # PyPI configuration file
 .pypirc
 
@@ -216,3 +219,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# output files
+*.out
+
+# apptainer images
+*.sif

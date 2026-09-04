@@ -1,0 +1,50 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
+
+%arguments
+    MODEL=Qwen/Qwen2.5-0.5B-Instruct
+
+%labels
+    Application local-qwen
+    Version     1.0
+    Description Container for running Qwen2.5-0.5B-Instruct model queries locally, 
+                with model weights baked into the image at build time.
+
+%files
+    ../query_model.py    /opt/app/query_model.py
+    ../requirements.txt  /opt/app/requirements.txt
+
+%post
+    set -e
+    apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+    pip install --break-system-packages --no-cache-dir --upgrade pip
+    pip install --break-system-packages --no-cache-dir -r /opt/app/requirements.txt
+
+    export HF_HOME=/opt/app/hf-cache
+    mkdir -p "$HF_HOME"
+    # Download the model now, at build time
+    python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='{{ MODEL }}')"
+
+%environment
+    export HF_HOME=/opt/app/hf-cache
+    export PYTHONUNBUFFERED=1
+    export HF_HUB_OFFLINE=1
+
+%runscript
+    exec python /opt/app/query_model.py "$@"
+
+%help
+    Build the container (downloads {{ MODEL }}):
+        apptainer build local-llm-query-fixed.sif local-llm-query-fixed.def
+
+    Build with a different model baked in:
+        apptainer build --build-arg MODEL=cjvt/GaMS-2B-Instruct \
+            local-llm-query-fixed.sif local-llm-query-fixed.def
+
+    Run (CPU):
+        apptainer run local-llm-query-fixed.sif \
+            --prompt "What is the capital of Slovenia?"
+
+    Run (GPU):
+        apptainer run --nv local-llm-query-fixed.sif \
+            --prompt "Explain KV-cache in one sentence." --max-new-tokens 64

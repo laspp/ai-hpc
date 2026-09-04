@@ -1,0 +1,43 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
+
+%labels
+    Application local-llm-query
+    Version     1.0
+    Description Downloads a Hugging Face model with transformers and runs one query
+
+%files
+    ../query_model.py    /opt/app/query_model.py
+    ../requirements.txt  /opt/app/requirements.txt
+
+%post
+    set -e
+    apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+    pip install --break-system-packages --no-cache-dir --upgrade pip
+    pip install --break-system-packages --no-cache-dir -r /opt/app/requirements.txt
+    mkdir -p /opt/app/hf-cache
+
+%environment
+    export HF_HOME=/opt/app/hf-cache
+    export PYTHONUNBUFFERED=1
+
+%runscript
+    exec python /opt/app/query_model.py "$@"
+
+%help
+    Downloads a Hugging Face model with `transformers`
+    and runs one query against it.
+
+    Build:
+        apptainer build local-llm-query.sif local-llm-query.def
+
+    Run (CPU):
+        apptainer run --bind /path/on/host/hf-cache:/opt/app/hf-cache \
+            local-llm-query.sif --prompt "What is the capital of Slovenia?"
+
+    Run (GPU):
+        apptainer run --nv --bind /path/on/host/hf-cache:/opt/app/hf-cache \
+            local-llm-query.sif \
+            --model Qwen/Qwen2.5-0.5B-Instruct \
+            --prompt "Explain KV-cache in one sentence." \
+            --max-new-tokens 64

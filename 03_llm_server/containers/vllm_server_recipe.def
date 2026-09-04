@@ -1,0 +1,36 @@
+Bootstrap: docker
+From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
+
+%post
+    apt-get update && apt-get install -y \
+        python3 \
+        python3-pip \
+        python3-venv \
+        git \
+        ca-certificates \
+        curl \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+    python3 -m venv /opt/venv
+    /opt/venv/bin/pip install --upgrade pip
+
+    /opt/venv/bin/pip install torch==2.8.0
+    /opt/venv/bin/pip install transformers==4.56.1
+    /opt/venv/bin/pip install vllm==0.10.2
+    /opt/venv/bin/pip install sentencepiece protobuf accelerate
+
+    # OpenWebUI gets its own venv so it cannot upgrade vLLM's tokenizer stack.
+    python3 -m venv /opt/openwebui-venv
+    /opt/openwebui-venv/bin/pip install --upgrade pip
+    /opt/openwebui-venv/bin/pip install open-webui
+
+    # Prevent xformers from failing on unsupported flash-attn versions.
+    /opt/venv/bin/pip uninstall -y flash-attn || true
+
+%environment
+    export PATH="/opt/venv/bin:$PATH"
+    export PYTHONUNBUFFERED=1
+
+%runscript
+    exec "$@"
