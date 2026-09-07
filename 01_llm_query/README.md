@@ -11,7 +11,7 @@ llm_query/
 ├── query_model.py                       # the script: loads a model and answers one prompt
 ├── requirements.txt                     # Python dependencies
 ├── containers/
-│   ├── local-llm-query.def              # downloads the model at run time (bind-mounted cache)
+│   ├── local-llm-query.def              # downloads the model at run time
 │   └── local-llm-query-fixed.def        # bakes the model into the image at build time
 └── README.md
 ```
