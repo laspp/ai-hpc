@@ -31,7 +31,12 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     export HF_HUB_OFFLINE=1
 
 %runscript
-    exec python /opt/app/query_model.py "$@"
+    exec python /opt/app/query_model.py --model {{ MODEL }} "$@"
+
+%test
+    set -e
+    ls -d "$HF_HOME"/hub/models--* >/dev/null 2>&1 || { echo "No model in cache"; exit 1; }
+    du -sh "$HF_HOME"
 
 %help
     Build the container (downloads {{ MODEL }}):

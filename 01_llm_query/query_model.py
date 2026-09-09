@@ -24,10 +24,6 @@ def parse_args() -> argparse.Namespace:
         "--prompt", default="What is the capital of Slovenia?",
         help="User prompt to send to the model.",
     )
-    parser.add_argument(
-        "--system", default="You are a helpful assistant.",
-        help="System prompt (used if the model has a chat template).",
-    )
     parser.add_argument("--max-new-tokens", type=int, default=128, help="Maximum number of new tokens to generate.")
     parser.add_argument("--temperature", type=float, default=0.7, help="Sampling temperature.")
 
@@ -55,7 +51,6 @@ def main() -> None:
 
     # Construct the query input
     query = [
-        {"role": "system", "content": args.system},
         {"role": "user", "content": args.prompt},
     ]
 

@@ -97,7 +97,6 @@ python query_model.py --prompt "What is the capital of Slovenia?"
 ```
 --model            Hugging Face repo id (default: Qwen/Qwen2.5-0.5B-Instruct)
 --prompt           the user prompt
---system           system prompt, sent as the chat "system" turn
 --max-new-tokens   generation length (default: 128)
 --temperature      sampling temperature; 0 = greedy decoding (default: 0.7)
 ```
