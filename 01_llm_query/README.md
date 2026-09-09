@@ -1,6 +1,6 @@
-# LLM-query
+# Small local LLM query container
 
-A minimal example project: use the `transformers` library to download a
+A minimal example: use the `transformers` library to download a
 model from the Hugging Face Hub and run a single query against it, packaged
 as an Apptainer container.
 
@@ -11,43 +11,42 @@ llm_query/
 ├── query_model.py                       # the script: loads a model and answers one prompt
 ├── requirements.txt                     # Python dependencies
 ├── containers/
-│   ├── local-llm-query.def              # downloads the model at run time
-│   └── local-llm-query-fixed.def        # bakes the model into the image at build time
+│   ├── local_llm.def                    # downloads the model at run time
+│   └── local_qwen.def                   # bakes the model Qwen2.5-0.5B-Instruct into the image at build time
 └── README.md
 ```
 
 ## Building and using the container with a fixed model
 
-`local-llm-query-fixed.def` downloads `Qwen/Qwen2.5-0.5B-Instruct` during the build,
-and bakes it into the image. Prebuilt container can be pulled from `ghcr.io/laspp/local_qwen:latest`:
+ Prebuilt container can be pulled from `ghcr.io/laspp/local_qwen:latest`:
 
 ```bash
-apptainer pull oras://ghcr.io/laspp/local_qwen
+apptainer pull oras://ghcr.io/laspp/local_qwen:latest
 ```
 
-The definition file's `%files` entries (`../query_model.py`, `../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`: 
+If you want to build the container yourself use the definition file `local_qwen.def`. Note, that the definition file's `%files` entries (`../query_model.py`, `../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`. During build, by default `Qwen/Qwen2.5-0.5B-Instruct` is downloaded and baked into the image. 
 
 ```bash
 cd containers
-apptainer build local-llm-query-fixed.sif local-llm-query-fixed.def
+apptainer build local_qwen_latest.sif local_qwen.def
 ```
 
 You can change the model using `--build-arg`:
 
 ```bash
 apptainer build --build-arg MODEL=microsoft/Phi-3-mini-4k-instruct \
-    local-llm-query-fixed.sif local-llm-query-fixed.def
+    local_phi.sif local_qwen.def
 ```
 
 Run the model on the Arnes cluster:
 
 ```bash
 # CPU
-srun apptainer run local-llm-query-fixed.sif \
+srun apptainer run local_qwen_latest.sif \
     --prompt "What is the capital of Slovenia?"
 
 # GPU
-srun --partition=gpu --gpus=1 apptainer run --nv local-llm-query-fixed.sif \
+srun --partition=gpu --gpus=1 apptainer run --nv local_qwen_latest.sif \
     --prompt "Explain KV-cache in one sentence." --max-new-tokens 64
 ```
 
@@ -56,16 +55,15 @@ srun --partition=gpu --gpus=1 apptainer run --nv local-llm-query-fixed.sif \
 Prebuilt container can be pulled from `ghcr.io/laspp/local_llm:latest`:
 
 ```bash
-apptainer pull oras://ghcr.io/laspp/local_llm
+apptainer pull oras://ghcr.io/laspp/local_llm:latest
 ```
 
-The definition file's `%files` entries (`../query_model.py`,`../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`:
+If you want to build the container yourself use the definition file `local_llm.def`. Note, that the definition file's `%files` entries (`../query_model.py`, `../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`: The definition file's `%files` entries (`../query_model.py`,`../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`:
 
 ```bash
 cd containers
-apptainer build local-llm-query.sif local-llm-query.def
+apptainer build local_llm_latest.sif local_llm.def
 ```
-
 Create a Hugging Face cache directory to store the downloaded models in your home folder:
 
 ```bash
@@ -76,11 +74,11 @@ Run the model on the Arnes cluster:
 ```bash
 # CPU
 srun apptainer run --bind ~/hf-cache:/opt/app/hf-cache \
-    local-llm-query.sif --prompt "What is the capital of Slovenia?"
+    local_llm_latest.sif --prompt "What is the capital of Slovenia?"
 
 # GPU
 srun --partition=gpu --gpus=1 apptainer run --nv --bind ~/hf-cache:/opt/app/hf-cache \
-    local-llm-query.sif \
+    local_llm_latest.sif \
     --model Qwen/Qwen2.5-0.5B-Instruct \
     --prompt "Explain KV-cache in one sentence." \
     --max-new-tokens 64
