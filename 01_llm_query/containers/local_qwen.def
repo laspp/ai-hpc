@@ -35,16 +35,16 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 
 %help
     Build the container (downloads {{ MODEL }}):
-        apptainer build local-llm-query-fixed.sif local-llm-query-fixed.def
+        apptainer build local_qwen_latest.sif local_qwen.def
 
     Build with a different model baked in:
         apptainer build --build-arg MODEL=cjvt/GaMS-2B-Instruct \
-            local-llm-query-fixed.sif local-llm-query-fixed.def
+            local_qwen_latest.sif local_qwen.def
 
     Run (CPU):
-        apptainer run local-llm-query-fixed.sif \
+        apptainer run local_qwen_latest.sif \
             --prompt "What is the capital of Slovenia?"
 
     Run (GPU):
-        apptainer run --nv local-llm-query-fixed.sif \
+        apptainer run --nv local_qwen_latest.sif \
             --prompt "Explain KV-cache in one sentence." --max-new-tokens 64

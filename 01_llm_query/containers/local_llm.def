@@ -2,7 +2,7 @@ Bootstrap: docker
 From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 
 %labels
-    Application local-llm-query
+    Application local_llm
     Version     1.0
     Description Downloads a Hugging Face model with transformers and runs one query
 
@@ -29,15 +29,15 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     and runs one query against it.
 
     Build:
-        apptainer build local-llm-query.sif local-llm-query.def
+        apptainer build local_llm_latest.sif local_llm_latest.def
 
     Run (CPU):
         apptainer run --bind /path/on/host/hf-cache:/opt/app/hf-cache \
-            local-llm-query.sif --prompt "What is the capital of Slovenia?"
+            local_llm_latest.sif --prompt "What is the capital of Slovenia?"
 
     Run (GPU):
         apptainer run --nv --bind /path/on/host/hf-cache:/opt/app/hf-cache \
-            local-llm-query.sif \
+            local_llm_latest.sif \
             --model Qwen/Qwen2.5-0.5B-Instruct \
             --prompt "Explain KV-cache in one sentence." \
             --max-new-tokens 64
