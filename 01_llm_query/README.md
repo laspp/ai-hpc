@@ -7,7 +7,7 @@ as an Apptainer container.
 ## Contents
 
 ```
-llm_query/
+01_llm_query/
 ├── query_model.py                       # the script: loads a model and answers one prompt
 ├── requirements.txt                     # Python dependencies
 ├── containers/
