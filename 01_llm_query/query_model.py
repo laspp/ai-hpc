@@ -9,6 +9,7 @@ Usage:
 """
 import argparse
 import time
+import resource
 
 import torch
 from transformers import GenerationConfig, pipeline
@@ -36,19 +37,17 @@ def main() -> None:
     device = 0 if torch.cuda.is_available() else -1  #  GPU index or -1 for CPU
     device_name = torch.cuda.get_device_name(0) if device == 0 else "CPU"
     print(f"Loading '{args.model}' on {'cuda:0' if device == 0 else 'cpu'} ({device_name}) ...")
-
+    if device == 0:
+        torch.cuda.reset_peak_memory_stats(0)
     t0 = time.time()
     pipe = pipeline(
         task="text-generation",
         model=args.model,
-        # bfloat16 tensor cores require Ampere+ (compute capability 8.0); older
-        # GPUs like V100 (7.0) don't support it, so we use float16 there.
-        # CPU-only inference uses float32.
-        dtype=torch.float16 if device == 0 else torch.float32,
+        dtype="auto",
         device=device,
     )
     print(f"Model loaded in {time.time() - t0:.1f}s on {pipe.model.device}")
-
+    print(next(pipe.model.parameters()).dtype)
     # Construct the query input
     query = [
         {"role": "user", "content": args.prompt},
@@ -69,17 +68,24 @@ def main() -> None:
         generation_config=generation_config,
         clean_up_tokenization_spaces=False,
     )
+    
     gen_time = time.time() - t0
 
     # get the response
     response = outputs[0]["generated_text"][-1]["content"]
-
     print("\n=== Prompt ===")
     print(args.prompt)
     print("\n=== Response ===")
     print(response.strip())
     print(f"\ngenerated in {gen_time:.1f}s ")
-          
-
+    #Print token counts and memory usage
+    prompt_tokens = len(pipe.tokenizer.encode(args.prompt))
+    response_tokens = len(pipe.tokenizer.encode(response))
+    print(f"Prompt tokens: {prompt_tokens}, response tokens: {response_tokens}, total tokens: {prompt_tokens + response_tokens}")
+    peak_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    print(f"Model Memory footprint: {pipe.model.get_memory_footprint() / 1e9:.2f} GB")
+    print(f"Peak RSS since process start: {peak_kb / 1e6:.2f} GB")
+    if device == 0:
+        print(f"Peak GPU memory allocated: {torch.cuda.max_memory_allocated(0) / 1e9:.2f} GB")
 if __name__ == "__main__":
     main()

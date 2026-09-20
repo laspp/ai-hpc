@@ -4,7 +4,7 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 %labels
     Application llm-ocr
     Version     1.0
-    Description Downloads a vision-language OCR model (default: GLM-OCR) and extracts text from a PDF
+    Description Uses a vision-language OCR model and extracts text from a PDF
 
 %files
     ../llm-ocr.py         /opt/app/llm-ocr.py
@@ -24,27 +24,25 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     exec python /opt/app/llm-ocr.py "$@"
 
 %help
-    VLM-OCR container: downloads a vision-language model with `transformers`
+    local-llm-ocr: downloads a vision-language model with `transformers`
     and extracts text from a PDF, page by page. Defaults to
     zai-org/GLM-OCR. Pass --model to
     use a different image-text-to-text model instead.
 
     Build:
-        apptainer build hf.sif model.def
+        apptainer build local_llm_ocr_latest.sif local_llm_ocr.def
 
     Run (GPU):
         apptainer run --nv --bind /path/on/host/hf-cache:/opt/app/hf-cache \
-            hf.sif /path/to/input.pdf -o /path/to/output.txt
+            local_llm_ocr_latest.sif /path/to/input.pdf -o /path/to/output.txt
 
     Run (CPU): (slow, small pages recommended):
         apptainer run --bind /path/on/host/hf-cache:/opt/app/hf-cache \
-            hf.sif /path/to/input.pdf
+            local_llm_ocr_latest.sif /path/to/input.pdf
 
     Useful flags:
         --model "zai-org/GLM-OCR"         set the model to use (default: GLM-OCR)
         --pages "1-3,5"                   only OCR selected pages (1-indexed)
-        --prompt "Table Recognition:"     switch task (GLM-OCR only)
-        --dpi 300                         higher-resolution page rendering
-        --max-long-side 1600              change the resolution cap (higher = more GPU memory)
-                                            
-        --max-new-tokens 8192              allow longer output for dense pages
+        --prompt "Text Recognition:"     switch task (GLM-OCR only)
+        --dpi 300                         higher-resolution page rendering                                  
+        --max-new-tokens 8192             allow longer output for dense pages

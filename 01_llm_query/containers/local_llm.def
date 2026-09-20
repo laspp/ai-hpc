@@ -24,6 +24,12 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 %runscript
     exec python /opt/app/query_model.py "$@"
 
+%test
+    set -e
+    python -c "import torch, transformers, accelerate; print('torch', torch.__version__); print('transformers', transformers.__version__)"
+    python /opt/app/query_model.py --help >/dev/null
+    echo "OK: dependencies import and query_model.py CLI is valid"
+
 %help
     Downloads a Hugging Face model with `transformers`
     and runs one query against it.

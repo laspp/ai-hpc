@@ -1,0 +1,56 @@
+Bootstrap: docker
+From: python:3.12-slim-bookworm
+
+%labels
+    Application vllm-openwebui-server
+    Version     1.0
+    Description Serves an LLM via vLLM's OpenAI-compatible API, with OpenWebUI as a chat frontend
+
+%post
+    set -e
+    apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates \
+        curl \
+        && rm -rf /var/lib/apt/lists/*
+
+    mkdir -p /hf-cache /openwebui-data
+
+    # Install uv package manager
+    pip install --break-system-packages --no-cache-dir uv
+
+    # Install vLLM and OpenWebUI in separate virtual environments to avoid dependency conflicts
+    # Install an older version of vLLM to avoid issues when running on V100 GPUs
+    uv venv /opt/venv
+    uv pip install --python /opt/venv/bin/python transformers==4.56.1
+    uv pip install --python /opt/venv/bin/python vllm==0.10.2
+
+    # Uninstall flash-attn as it is not supported on V100 GPUs and can cause runtime errors
+    uv pip uninstall --python /opt/venv/bin/python flash-attn || true
+
+    uv venv /opt/openwebui-venv
+    uv pip install --python /opt/openwebui-venv/bin/python open-webui
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export HF_HOME=/hf-cache
+
+%runscript
+    exec "$@"
+
+%test
+    set -e
+    /opt/venv/bin/python3 -c "import torch, transformers, vllm; print('torch', torch.__version__); print('transformers', transformers.__version__); print('vllm', vllm.__version__)"
+    /opt/venv/bin/vllm --help >/dev/null
+    /opt/openwebui-venv/bin/python3 -c "import open_webui"
+    /opt/openwebui-venv/bin/open-webui --help >/dev/null
+    echo "OK: both venvs import cleanly and their CLIs are valid"
+
+%help
+    Serves an LLM via vLLM's OpenAI-compatible API with OpenWebUI as a chat frontend
+
+    Run the vLLM server:
+        apptainer exec --nv model.sif /opt/venv/bin/vllm serve <model> [vllm args...]
+
+    Run OpenWebUI:
+        apptainer exec model.sif /opt/openwebui-venv/bin/open-webui serve
