@@ -14,6 +14,14 @@ as a browser-based chat frontend, packaged as a single Apptainer container.
 
 ## Building the container
 
+Prebuilt container can be pulled from `ghcr.io/laspp/llm_server:latest`:
+
+```bash
+apptainer pull oras://ghcr.io/laspp/llm_server:latest
+```
+
+To build it yourself, run:
+
 ```bash
 cd containers
 apptainer build llm_server_latest.sif llm_server.def

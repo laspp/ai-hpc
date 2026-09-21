@@ -22,6 +22,12 @@ concatenated into one output text file.
 
 ## Building the container
 
+ Prebuilt container can be pulled from `ghcr.io/laspp/local_llm_ocr:latest`:
+
+```bash
+apptainer pull oras://ghcr.io/laspp/local_llm_ocr:latest
+```
+
 Note that the definition file's `%files` entries (`../llm-ocr.py`,`../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`:
 
 ```bash
