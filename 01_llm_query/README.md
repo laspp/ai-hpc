@@ -1,8 +1,7 @@
-# Small local LLM query container
+# Running a simple chat model inside a container
 
-A minimal example: use the `transformers` library to download a
-model from the Hugging Face Hub and run a single query against it, packaged
-as an Apptainer container.
+The example uses the `transformers` library to download a chat model from the Hugging Face Hub and run a single query against it.
+It is packaged as an Apptainer container.
 
 ## Contents
 
@@ -16,7 +15,7 @@ as an Apptainer container.
 └── README.md
 ```
 
-## Building and using the container with a fixed model
+## Building and using the container with a preloaded model
 
  Prebuilt container can be pulled from `ghcr.io/laspp/local_qwen:latest`:
 
@@ -24,7 +23,7 @@ as an Apptainer container.
 apptainer pull oras://ghcr.io/laspp/local_qwen:latest
 ```
 
-If you want to build the container yourself use the definition file `local_qwen.def`. Note, that the definition file's `%files` entries (`../query_model.py`, `../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`. During build, by default `Qwen/Qwen2.5-0.5B-Instruct` is downloaded and baked into the image. 
+If you want to build the container yourself use the definition file `local_qwen.def`. Note, that the definition file's `%files` entries (`../query_model.py`, `../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`. By default `Qwen/Qwen2.5-0.5B-Instruct` is downloaded and baked into the image. To build the model:
 
 ```bash
 cd containers
@@ -84,11 +83,11 @@ srun --partition=gpu --gpus=1 apptainer run --nv --bind ~/hf-cache:/opt/app/hf-c
     --max-new-tokens 64
 ```
 
-## Run locally with no container
+## Run the Python script with no container
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt torch     # add the torch line since no base image here
+pip install -r requirements.txt torch
 python query_model.py --prompt "What is the capital of Slovenia?"
 ```
 

@@ -34,11 +34,13 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
+    # Select device: GPU if available, otherwise CPU
     device = 0 if torch.cuda.is_available() else -1  #  GPU index or -1 for CPU
     device_name = torch.cuda.get_device_name(0) if device == 0 else "CPU"
     print(f"Loading '{args.model}' on {'cuda:0' if device == 0 else 'cpu'} ({device_name}) ...")
     if device == 0:
         torch.cuda.reset_peak_memory_stats(0)
+    # Create the pipline
     t0 = time.time()
     pipe = pipeline(
         task="text-generation",
@@ -48,6 +50,7 @@ def main() -> None:
     )
     print(f"Model loaded in {time.time() - t0:.1f}s on {pipe.model.device}")
     print(next(pipe.model.parameters()).dtype)
+    
     # Construct the query input
     query = [
         {"role": "user", "content": args.prompt},
@@ -63,6 +66,8 @@ def main() -> None:
     )
 
     t0 = time.time()
+
+    # Run inference
     outputs = pipe(
         query,
         generation_config=generation_config,
@@ -71,14 +76,15 @@ def main() -> None:
     
     gen_time = time.time() - t0
 
-    # get the response
+    # Print the response
     response = outputs[0]["generated_text"][-1]["content"]
     print("\n=== Prompt ===")
     print(args.prompt)
     print("\n=== Response ===")
     print(response.strip())
     print(f"\ngenerated in {gen_time:.1f}s ")
-    #Print token counts and memory usage
+    
+    # Print token counts and memory usage
     prompt_tokens = len(pipe.tokenizer.encode(args.prompt))
     response_tokens = len(pipe.tokenizer.encode(response))
     print(f"Prompt tokens: {prompt_tokens}, response tokens: {response_tokens}, total tokens: {prompt_tokens + response_tokens}")

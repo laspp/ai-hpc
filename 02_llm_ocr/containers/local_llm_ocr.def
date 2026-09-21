@@ -25,7 +25,7 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 
 %help
     local-llm-ocr: downloads a vision-language model with `transformers`
-    and extracts text from a PDF, page by page. Defaults to
+    and extracts text from a PDF, page by page. The default model is
     zai-org/GLM-OCR. Pass --model to
     use a different image-text-to-text model instead.
 
@@ -41,8 +41,9 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
             local_llm_ocr_latest.sif /path/to/input.pdf
 
     Useful flags:
-        --model "zai-org/GLM-OCR"         set the model to use (default: GLM-OCR)
-        --pages "1-3,5"                   only OCR selected pages (1-indexed)
-        --prompt "Text Recognition:"     switch task (GLM-OCR only)
-        --dpi 300                         higher-resolution page rendering                                  
-        --max-new-tokens 8192             allow longer output for dense pages
+        --model             Set the model to use (default: zai-org/GLM-OCR)
+        --pages             Only OCR selected pages (default: all pages)
+        --prompt            Prompt for the vision model (default:"Text Recognition:")
+        --dpi               Set the rendering resolution for PDF pages (default: 150)                                  
+        --max-new-tokens    Set the maximum number of tokens to generate for each page (default: 4096)
+        --page-separator    Set the string to separate pages in the output (default: "\n\n--- PAGE {page} ---\n\n")

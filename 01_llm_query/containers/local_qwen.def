@@ -5,10 +5,9 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     MODEL=Qwen/Qwen2.5-0.5B-Instruct
 
 %labels
-    Application local-qwen
+    Application local_qwen
     Version     1.0
-    Description Container for running Qwen2.5-0.5B-Instruct model queries locally, 
-                with model weights baked into the image at build time.
+    Description Container for running {{ MODEL }} model queries, with model weights baked into the image at build time.
 
 %files
     ../query_model.py    /opt/app/query_model.py
@@ -39,6 +38,8 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     du -sh "$HF_HOME"
 
 %help
+    Runs queries against the {{ MODEL }} from Hugging Face.
+
     Build the container (downloads {{ MODEL }}):
         apptainer build local_qwen_latest.sif local_qwen.def
 

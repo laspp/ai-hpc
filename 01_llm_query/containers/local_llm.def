@@ -4,7 +4,7 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
 %labels
     Application local_llm
     Version     1.0
-    Description Downloads a Hugging Face model with transformers and runs one query
+    Description Downloads a Hugging Face model with transformers and runs one query.
 
 %files
     ../query_model.py    /opt/app/query_model.py
@@ -31,7 +31,7 @@ From: pytorch/pytorch:2.12.0-cuda12.6-cudnn9-runtime
     echo "OK: dependencies import and query_model.py CLI is valid"
 
 %help
-    Downloads a Hugging Face model with `transformers`
+    Downloads a Hugging Face model with transformers
     and runs one query against it.
 
     Build:

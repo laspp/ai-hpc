@@ -1,11 +1,7 @@
 # OCR using a Large Language Model
 
-Extract text from a PDF using a vision-language OCR model via `transformers`,
-packaged as an Apptainer container for the Arnes HPC cluster.
-
-Defaults to [zai-org/GLM-OCR](https://huggingface.co/zai-org/GLM-OCR), a
-lightweight dedicated OCR model — best on Chinese/English, also covers
-French/Spanish/Russian/German/Japanese/Korean.
+Extract text from a PDF using a vision-language OCR model via `transformers`, packaged as an Apptainer container.
+Defaults to [zai-org/GLM-OCR](https://huggingface.co/zai-org/GLM-OCR), a lightweight dedicated OCR model.
 
 ## Contents
 
@@ -26,9 +22,7 @@ concatenated into one output text file.
 
 ## Building the container
 
-Note that the definition file's `%files` entries (`../llm-ocr.py`,
-`../requirements.txt`) are relative to the directory you run
-`apptainer build` from, so build it from inside `containers/`:
+Note that the definition file's `%files` entries (`../llm-ocr.py`,`../requirements.txt`) are relative to the directory you run `apptainer build` from, so build it from inside `containers/`:
 
 ```bash
 cd containers
@@ -48,9 +42,7 @@ You can change the parameters like input, output, pages in the `run_ocr.sbatch` 
 
 ## Multi-GPU: splitting pages across GPUs with a job array
 
-For a large PDF, [run_ocr_array.sbatch](run_ocr_array.sbatch) splits a fixed
-page range into as many contiguous, near-equal chunks as there are array
-tasks, and OCRs each chunk on its own GPU in parallel:
+For a large PDF, [run_ocr_array.sbatch](run_ocr_array.sbatch) splits a fixed page range into as many contiguous, near-equal chunks as there are array tasks, and OCRs each chunk on its own GPU in parallel:
 
 1. Edit `START_PAGE`/`END_PAGE` and `--array=0-N` (N = GPU count - 1) at the top of the file.
 2. Submit it: `sbatch run_ocr_array.sbatch`. Each task writes its own `ocr_parts/part-NNN.txt`.
@@ -58,8 +50,6 @@ tasks, and OCRs each chunk on its own GPU in parallel:
    ```bash
    cat ocr_parts/part-*.txt > output.txt
    ```
-
-
 ## Python script options
 
 ```
