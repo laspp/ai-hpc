@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=vllm_openwebui_server
 #SBATCH --partition=gpu
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --gpus-per-node=1
@@ -45,7 +45,7 @@ echo
 echo "# From your computer, create SSH tunnels with:"
 echo "ssh -N -L ${OPENWEBUI_PORT}:${SLURMD_NODENAME}:${OPENWEBUI_PORT} -L ${VLLM_PORT}:${SLURMD_NODENAME}:${VLLM_PORT} ${USER}@${LOGIN_HOST}"
 echo
-echo "# Then open OpenWebUI: http://127.0.0.1:${OPENWEBUI_PORT}"
+echo "# Then open OpenWebUI: http://localhost:${OPENWEBUI_PORT}"
 echo "# API key configured for both services: ${API_KEY}"
 echo
 
@@ -75,9 +75,10 @@ srun --overlap apptainer exec \
   --env DATA_DIR=/openwebui-data \
   --env STATIC_DIR=/openwebui-data/static \
   --env ENABLE_PERSISTENT_CONFIG=False \
+  --env DEFAULT_MODEL_PARAMS='{"function_calling":"legacy"}' \
   --env ENABLE_OLLAMA_API=false \
   --env ENABLE_OPENAI_API=true \
-  --env OPENAI_API_BASE_URLS="http://127.0.0.1:${VLLM_PORT}/v1" \
+  --env OPENAI_API_BASE_URLS="http://localhost:${VLLM_PORT}/v1" \
   --env OPENAI_API_KEYS="${API_KEY}" \
   ${CONTAINER_SIF} \
   /opt/openwebui-venv/bin/open-webui serve --host 0.0.0.0 --port "${OPENWEBUI_PORT}" &

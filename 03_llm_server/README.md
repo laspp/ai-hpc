@@ -42,7 +42,7 @@ The job's log  also prints the SSH tunnel command for the node it landed on at t
 ```bash
 ssh -N -L 8080:<node>:8080 -L 8000:<node>:8000 <user>@hpc-login3.arnes.si
 ```
-Run the above command from your own computer, then open `http://127.0.0.1:8080` in a
+Run the above command from your own computer, then open `http://localhost:8080` in a
 browser.
 
 ## Configuration options
