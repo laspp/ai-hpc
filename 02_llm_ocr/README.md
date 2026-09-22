@@ -32,8 +32,10 @@ Note that the definition file's `%files` entries (`../llm-ocr.py`,`../requiremen
 
 ```bash
 cd containers
-apptainer build local_llm_ocr_latest.sif local_llm_ocr.def
+srun --cpus-per-taks=16 apptainer build local_llm_ocr_latest.sif local_llm_ocr.def
 ```
+ 
+The above command builds the container on a cluster compute node. Ommit `srun --cpus-per-taks=16` if building locally.
 
 ## Submitting as a SLURM job
 

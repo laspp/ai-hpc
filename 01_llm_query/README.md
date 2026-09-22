@@ -27,15 +27,17 @@ If you want to build the container yourself use the definition file `local_qwen.
 
 ```bash
 cd containers
-apptainer build local_qwen_latest.sif local_qwen.def
+srun --cpus-per-taks=16 apptainer build local_qwen_latest.sif local_qwen.def
 ```
 
 You can change the model using `--build-arg`:
 
 ```bash
-apptainer build --build-arg MODEL=microsoft/Phi-3-mini-4k-instruct \
+srun --cpus-per-taks=16 apptainer build --build-arg MODEL=microsoft/Phi-3-mini-4k-instruct \
     local_phi.sif local_qwen.def
 ```
+
+The above commands build the container on a cluster compute node. Ommit `srun --cpus-per-taks=16` if building locally.
 
 Run the model on the Arnes cluster:
 
@@ -61,7 +63,7 @@ If you want to build the container yourself use the definition file `local_llm.d
 
 ```bash
 cd containers
-apptainer build local_llm_latest.sif local_llm.def
+srun --cpus-per-taks=16 apptainer build local_llm_latest.sif local_llm.def
 ```
 Create a Hugging Face cache directory to store the downloaded models in your home folder:
 

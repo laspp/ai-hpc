@@ -24,8 +24,9 @@ To build it yourself, run:
 
 ```bash
 cd containers
-apptainer build llm_server_latest.sif llm_server.def
+srun --cpus-per-taks=16 apptainer build llm_server_latest.sif llm_server.def
 ```
+ The above command builds the container on a cluster compute node. Ommit `srun --cpus-per-taks=16` if building locally.
 
 ## Submitting as a SLURM job
 
