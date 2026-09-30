@@ -16,6 +16,6 @@ TXT_OUT=output.txt
 echo "Running OCR on $PDF_IN, output to $TXT_OUT"
 mkdir -p "$HF_CACHE"
 
-apptainer run --nv --bind "$HF_CACHE:/opt/app/hf-cache" "$SIF" "$PDF_IN" -o "$TXT_OUT" --model "zai-org/GLM-OCR" --prompt "Text Recognition:" --pages "8-11"
+srun apptainer run --nv --bind "$HF_CACHE:/opt/app/hf-cache" "$SIF" "$PDF_IN" -o "$TXT_OUT" --model "zai-org/GLM-OCR" --prompt "Text Recognition:" --pages "8-11"
     #--bind "$(dirname "$TXT_OUT")":/data_out \
     
