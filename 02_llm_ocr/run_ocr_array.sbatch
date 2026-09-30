@@ -39,7 +39,7 @@ PART_OUT="$OUT_DIR/part-$(printf '%03d' "$SLURM_ARRAY_TASK_ID").txt"
 
 
 echo "Task $SLURM_ARRAY_TASK_ID/$SLURM_ARRAY_TASK_COUNT: OCR-ing pages $START-$END of $PDF_IN, output to $PART_OUT"
-apptainer run --nv --bind "$HF_CACHE:/opt/app/hf-cache" "$SIF" \
+srun apptainer run --nv --bind "$HF_CACHE:/opt/app/hf-cache" "$SIF" \
     "$PDF_IN" -o "$PART_OUT" \
     --model "zai-org/GLM-OCR" --prompt "Text Recognition:" \
     --pages "${START}-${END}"
